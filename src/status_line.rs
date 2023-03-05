@@ -8,6 +8,7 @@ fn status_line() -> oxi::Result<()> {
     Ok(())
 }
 
+/// toggle spell checking
 fn spell_toggle() -> oxi::Result<()> {
     let mut current_window = Window::current();
     let mut curr_buf = Buffer::current();
@@ -35,4 +36,31 @@ fn test_spell_toggle() {
     spell_toggle().expect("spell_toggle failed");
     let what: String = curr_buf.get_option("spelllang").expect("get_option failed");
     assert_eq!(what, "en_us,de");
+}
+
+fn git_branch() -> oxi::Result<String> {
+    let loaded_fugitive: bool = api::get_var("loaded_fugitive")?;
+
+    if loaded_fugitive {
+        // let branch = "Main";
+        // NOTE: I'm not sure how to test this, but it works
+        let branch: String = api::call_function("FugitiveHead", vec![])?;
+        if !branch.is_empty() {
+            let width = Window::current().get_width()?;
+            // let width = 100;
+            if width <= 80 {
+                return Ok(format!(" {}", branch.to_uppercase().chars().take(2).collect::<String>()));
+            }
+            return Ok(format!(" {}", branch.to_uppercase()));
+        }                   
+    }      
+
+    Ok(String::new())
+}               
+
+#[oxi::test]
+fn test_git_branch() {
+    api::set_var("loaded_fugitive", true).expect("set_var failed");
+    let branch = git_branch().expect("git_branch failed");
+    assert_eq!(branch, "");
 }
