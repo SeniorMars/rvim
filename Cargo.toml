@@ -8,4 +8,4 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-nvim-oxi = {version = "0.1", features = ["test"]}
+nvim-oxi = { version = "0.2.2", features = ["test", "neovim-0-8"] }
